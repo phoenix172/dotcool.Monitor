@@ -34,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v4.6.2
       with:
         name: "dotcool.monitor-linux-x64-${{ steps.extract_branch.outputs.branch }}-${{ github.run_id }}"
-        path: ${{ github. }}  ./publish/linux-x64/
+        path: ./publish/linux-x64/
     - name: Upload a Windows Artifact
       uses: actions/upload-artifact@v4.6.2
       with:
