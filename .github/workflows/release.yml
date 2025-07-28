@@ -13,6 +13,8 @@ jobs:
     name: Release pushed tag
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
       - name: Grab latest build id
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
