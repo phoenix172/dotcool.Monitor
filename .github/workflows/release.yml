@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Grab latest build id
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: extract_run_id
         run: echo "run_id=$(gh run list -c '$pr_head_sha' -w '$workflow' -b '$branch' -L 1 --json databaseId --jq '.[0].databaseId')" >> $GITHUB_OUTPUT
       - name: Download build artifacts
