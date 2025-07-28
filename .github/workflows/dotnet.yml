@@ -6,6 +6,8 @@ name: .NET
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "main" ]
 
@@ -24,3 +26,14 @@ jobs:
       run: dotnet publish -r linux-x64 -c Release -o ./publish/linux-x64/ --self-contained /p:PublishSingleFile=true
     - name: Build Windows
       run: dotnet publish -r win-x64 -c Release -o ./publish/win-x64/ --self-contained /p:PublishSingleFile=true
+    - name: Upload a Linux Artifact
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        name: "dotcool.monitor-linux-x64-${{ github.ref }}-${{ github.run_id }}"
+        path: ./publish/linux-x64/
+    - name: Upload a Windows Artifact
+      uses: actions/upload-artifact@v4.6.2
+      with:
+        name: "dotcool.monitor-windows-x64-${{ github.ref }}-${{ github.run_id }}"
+        path: ./publish/win-x64/
+          
