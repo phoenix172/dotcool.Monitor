@@ -11,6 +11,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <IncludeNativeLibrariesForSelfExtract>True</IncludeNativeLibrariesForSelfExtract>
+        <StaticWebAssetsEnabled>False</StaticWebAssetsEnabled>
     </PropertyGroup>
 
     <ItemGroup>
