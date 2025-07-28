@@ -1,0 +1,26 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Build Linux
+      run: dotnet publish -r linux-x64 -c Release -o ./publish/linux-x64/ --self-contained /p:PublishSingleFile=true
+    - name: Build Windows
+      run: dotnet publish -r win-x64 -c Release -o ./publish/win-x64/ --self-contained /p:PublishSingleFile=true
