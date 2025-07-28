@@ -13,12 +13,16 @@ jobs:
     name: Release pushed tag
     runs-on: ubuntu-latest
     steps:
+      - name: Grab latest build id
+        id: extract_run_id
+        run: echo "run_id=$(gh run list -c '$pr_head_sha' -w '$workflow' -b '$branch' -L 1 --json databaseId --jq '.[0].databaseId')" >> $GITHUB_OUTPUT
       - name: Download build artifacts
         uses: actions/download-artifact@v4.3.0
         with:
           path: ./artifacts
           # A glob pattern matching the artifacts that should be downloaded. Ignored if name is specified.
-          pattern: "dotcool.monitor-windows-x64-${{ steps.extract_branch.outputs.branch }}-*"
+          pattern: "dotcool.monitor-windows-x64-${{ steps.extract_branch.outputs.branch }}*"
+          run_id: ${{ steps.extract_run_id.outputs.run_id }}
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
