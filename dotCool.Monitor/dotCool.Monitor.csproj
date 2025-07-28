@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup> 
+        <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+        <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+        <RuntimeIdentifier Condition="'$(IsWindows)'=='true'">win-x64</RuntimeIdentifier>
+        <RuntimeIdentifier Condition="'$(IsLinux)'=='true'">linux-x64</RuntimeIdentifier>
+        <TargetFramework Condition="'$(RuntimeIdentifier)'=='win-x64'">net9.0-windows</TargetFramework>
+        <TargetFramework Condition="'$(RuntimeIdentifier)'=='linux-x64'">net9.0</TargetFramework>
+        <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="InTheHand.BluetoothLE" Version="4.0.42" />
+        <PackageReference Include="Linux.Bluetooth" Version="5.67.1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+</Project>
