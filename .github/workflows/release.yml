@@ -13,6 +13,12 @@ jobs:
     name: Release pushed tag
     runs-on: ubuntu-latest
     steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4.3.0
+        with:
+          path: ./artifacts
+          # A glob pattern matching the artifacts that should be downloaded. Ignored if name is specified.
+          pattern: "dotcool.monitor-windows-x64-${{ steps.extract_branch.outputs.branch }}-*"
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -23,3 +29,11 @@ jobs:
               --title="${tag#v}" \
               --draft=true \
               --prerelease=true
+      
+      - name: Upload Release Artifacts
+        uses: chihqiang/upload-asset-action@v0.1.0
+        with:
+          # GitHub Token with `repo` scope
+          github_token: ${GITHUB_TOKEN}
+          # List of files to upload, separated by space
+          files: ./artifacts
