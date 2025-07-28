@@ -5,9 +5,7 @@ name: .NET
 
 on:
   push:
-    branches: [ "main", "github-deployment-actions" ]
-    tags:
-      - 'v*'
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
