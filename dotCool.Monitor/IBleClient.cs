@@ -2,7 +2,7 @@
 
 public interface IBleClient
 {
-    Task<IAsyncDisposable> StartPassiveScanAsync();
+    Task<BluetoothScan> StartPassiveScanAsync();
 
     Task<IAsyncDisposable> SubscribeToAdvertisement(Func<BluetoothLeAdvertisement, Task> action, params string[] deviceIds);
 }
