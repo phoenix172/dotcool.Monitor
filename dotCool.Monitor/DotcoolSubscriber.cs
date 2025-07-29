@@ -16,6 +16,18 @@ public class DotcoolSubscriber : BackgroundService
         _logger = logger;
     }
 
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Done waiting for bluetooth. Subscribing...");
+        var deviceAddresses = _sensors.Select(x => x.BluetoothMacAddress).ToArray();
+        var scanTask = _handler.ScanAsync(stoppingToken);
+        await using (await _handler.Subscribe(OnAdvertisementReceived, deviceAddresses))
+        {
+            _logger.LogInformation("Subscribed to advertisements for devices: {Devices}", string.Join(", ", _sensors.Select(x => x.BluetoothMacAddress)));
+            await scanTask;
+        }
+    }
+
     private async Task OnAdvertisementReceived(BluetoothLeAdvertisement advertisement)
     {
         _logger.LogDebug("Advertisement: {@Advertisement}", advertisement);
@@ -44,26 +56,6 @@ public class DotcoolSubscriber : BackgroundService
                 _logger.LogError(ex, "Failed to send data for device {DeviceId} with service {ServiceId}",
                     advertisement.DeviceId, advertisement.ServiceId);
             }
-        }
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        await _handler.AwaitReady();
-        _logger.LogInformation("Done waiting for bluetooth. Subscribing...");
-        var disposable =
-            await _handler.Subscribe(OnAdvertisementReceived, _sensors.Select(x => x.BluetoothMacAddress).ToArray());
-        _logger.LogInformation("Subscribed to advertisements for devices: {Devices}", string.Join(", ", _sensors.Select(x => x.BluetoothMacAddress)));
-        try
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                await Task.Delay(1000, stoppingToken);
-            }
-        }
-        finally
-        {
-            await disposable.DisposeAsync();
         }
     }
 }

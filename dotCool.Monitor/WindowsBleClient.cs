@@ -4,7 +4,7 @@ namespace dotCool.Monitor;
 
 public class WindowsBleClient : IBleClient
 {
-    public async Task<IAsyncDisposable> StartPassiveScanAsync()
+    public async Task<BluetoothScan> StartPassiveScanAsync()
     {
         if (!await Bluetooth.GetAvailabilityAsync())
             throw new Exception("Bluetooth is not available");
@@ -14,10 +14,18 @@ public class WindowsBleClient : IBleClient
             AcceptAllAdvertisements = true
         };
         var scan = await Bluetooth.RequestLEScanAsync(bleScanOptions);
-        return new ActionDisposable(() =>
+        CancellationTokenSource cts = new();
+        var scanTask = Task.Run(async () =>
+        {
+            while (!cts.IsCancellationRequested)
+            {
+                await Task.Delay(1000, cts.Token);
+            }
+        }, cts.Token);
+        return new BluetoothScan(scanTask, async () =>
         {
             scan.Stop();
-            return Task.CompletedTask;
+            await cts.CancelAsync();
         });
     }
 

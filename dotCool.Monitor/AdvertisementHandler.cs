@@ -6,48 +6,37 @@ namespace dotCool.Monitor;
 
 public record BluetoothLeAdvertisement(string DeviceId, Guid ServiceId, byte[] Data);
 
-public class AdvertisementHandler : BackgroundService
+public class AdvertisementHandler
 {
     private readonly IBleClient _bluetooth;
     private readonly SensorBinding[] _sensors;
     private readonly ConcurrentDictionary<object, IAsyncDisposable> _subscriptions;
-    private bool _ready;
 
     public AdvertisementHandler(IBleClient bluetooth, SensorBinding[] sensors)
     {
         _subscriptions = new();
         _bluetooth = bluetooth;
         _sensors = sensors;
-        _ready = false;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task ScanAsync(CancellationToken stoppingToken)
     {
-        var scan = await _bluetooth.StartPassiveScanAsync();
-        _ready = true;
+        BluetoothScan? scan = null;
         try
         {
-            while (stoppingToken.IsCancellationRequested == false)
-            {
-                await Task.Delay(1000, stoppingToken);
-            }
+            scan = await _bluetooth.StartPassiveScanAsync();
+            stoppingToken.Register(async () => await scan.DisposeAsync());
+            await scan.Await();
         }
         finally
         {
-            await scan.DisposeAsync();
+            if(scan is not null)
+                await scan.DisposeAsync();
             foreach (var subscription in _subscriptions)
             {
                 await subscription.Value.DisposeAsync();
             }
         }
-    }
-
-    public bool Ready => _ready;
-
-    public async Task AwaitReady()
-    {
-        while (!_ready)
-            await Task.Delay(100);
     }
 
     public async Task<IAsyncDisposable> Subscribe(Func<BluetoothLeAdvertisement, Task> action,
